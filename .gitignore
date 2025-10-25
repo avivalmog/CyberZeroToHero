@@ -1,10 +1,19 @@
-    # VS Code specific files
-    .vscode/
-    *.code-workspace
+# VS Code specific files
+.vscode/
+*.code-workspace
 
-    # Log files
-    *.log
+# Log files
+*.log
 
-    # Operating System generated files
-    .DS_Store
-    Thumbs.db
+# Operating System generated files
+.DS_Store
+Thumbs.db
+
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# C extensions
+*.so
