@@ -1,0 +1,10 @@
+    # VS Code specific files
+    .vscode/
+    *.code-workspace
+
+    # Log files
+    *.log
+
+    # Operating System generated files
+    .DS_Store
+    Thumbs.db
