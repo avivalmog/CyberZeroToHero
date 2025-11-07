@@ -269,7 +269,7 @@ struct dot {
 
 struct fun_desc {
   char *name;
-  char (*fun)(char);
+  void (*fun)(char);
 };
 
 
@@ -279,11 +279,11 @@ typedef struct virus {
     unsigned char* sig;
 } virus;
 
-char coolfunc (char c){
+void coolfunc (char c){
    printf("cool func got called with arg:%c!\n", c);
 } 
 
-char coolfunc2 (char c){
+void coolfunc2 (char c){
    printf("cool func2 got called with arg:%c!\n", c);
 } 
 
@@ -386,65 +386,179 @@ Here, all the members are getting printed very well because one member is being 
 
 
 /* --- system call --- */
-
-/* for unix - 
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <errno.h>
 
-int rc;
-rc = syscall(SYS_chmod, "/etc/passwd", 0444);
-if (rc == -1)
-   fprintf(stderr, "chmod failed, errno = %d\n", errno);
-*/
+/* syscall table can be printed with: ausyscall --dump */
+
+void test_unix_systemcall(){
+   int rc;
+   rc = syscall(SYS_chmod, "/etc/passwd", 0444);
+   if (rc == -1)
+   {
+      fprintf(stderr, "chmod failed, errno = %d\n", errno);
+   }
+   rc = syscall(SYS_getpid);
+   if (rc == -1)
+   {
+      fprintf(stderr, "getpid failed, errno = %d\n", errno);
+   }
+   else{
+      fprintf(stdout, "getpid result: %d\n", rc);
+   }
+
+   const char *message = "Hello, direct sys_write!\n";
+   // Invoke the sys_write system call directly
+   // SYS_write is the system call number for write on Linux
+   // 1 is the file descriptor (STDOUT_FILENO)
+   // message is the buffer
+   // strlen(message) is the number of bytes
+   long result = syscall(SYS_write, STDOUT_FILENO, message, strlen(message));
+
+   if (result == -1) {
+      // Handle error
+      perror("syscall(SYS_write)");
+   }
+
+}
 
 
-
-/* --- fork, files, fds, pipes ---*/
-
-/*	
-   if (!(pid = fork()))
-   { 
-      execute(cmdLine);
+/* --- fork ---*/
+#include <sys/wait.h>
+void test_fork()
+{
+   int pid;
+   if (!(pid = fork())){
+      printf("this is the child process\n");
+      printf("going to sleep for 3 seconds..\n");
+      sleep(3);
+      printf("child process finished sleep, and now  exiting..\n");
       exit(1);
    }
-   if (cmdLine->blocking)
-   {
-      waitpid(pid ,NULL,0);
-   } 
-   
-   fprintf(stderr, "cd command failed\n");
-   
-   FILE *fopen(const char *filename, const char *mode)
+   printf("this is father process\n");
+   printf("waiting for child to finish..\n");
+   waitpid(pid, NULL, 0);
+   printf("father process here, can continue after child process exited\n");
+}
 
-   fclose(stdin);
-   fopen(pCmdLine->inputRedirect,"r");
+/* --- fds and dup --- */
+#include <unistd.h>
+#include <fcntl.h>
 
-   if (strncmp(line,"quit",4) != 0)
+void test_fds_dup(){
 
+   // Step 1: open the file for writing
+    int fd = open("output.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        return;
+    }
 
-   if (pipe(pipefd) == -1) {
-            perror("pipe");
-            exit(1);
-   }
+    // Step 2: save a copy of current stdout (terminal)
+    int saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1) {
+        perror("dup");
+        return;
+    }
+
+    // Step 3: redirect stdout to the file
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+        perror("dup2");
+        return;
+    }
+    close(fd); // no longer needed
+
+    // Step 4: print to the file (goes into output.txt)
+    printf("This goes into output.txt\n");
+    fflush(stdout);
+
+     // You can also use write() directly on fd 1
+    write(STDOUT_FILENO, "Direct write to fd=1\n", 21);
+
+    // Step 5: restore stdout back to the terminal
+    if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
+        perror("dup2 restore");
+        return;
+    }
+    close(saved_stdout);
+
+    // Step 6: now print to terminal again
+    printf("Restored stdout to terminal.\n");
+
+    // Step 7: open the file for reading
+    int fd_read = open("output.txt", O_RDONLY);
+    if (fd_read == -1) {
+        perror("open read");
+        return;
+    }
+
+    // Step 8: read and print file contents to terminal
+    printf("File contents:\n");
+    char buffer[128];
+    ssize_t bytes;
+    while ((bytes = read(fd_read, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[bytes] = '\0'; // null-terminate
+        printf("%s", buffer);
+    }
+    close(fd_read);
+
+}
+
+/* --- function pointers --- */
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) { 
+   return a - b;
+}
+
+int multiply(int a, int b) {
+    return a * b;
+}
+
+int divide(int a, int b) { 
+   return b ? a / b : 0; 
+}
+
+// Function that takes a function pointer as parameter 
+void operate(int x, int y, int (*func)(int, int)) {
+    printf("Result: %d\n", func(x, y));
+}
+
+// Function returning a function pointer 
+int (*chooseOperation(char op))(int, int) {
+    if (op == '+')
+        return add;
+    else
+        return multiply;
+}
+
+void test_function_pointers() {
     
-   cpid1 = fork();
-   if (cpid1 ==0)
-   { 
-      close(1); //stdout
-      int dup_fd = dup(pipefd[1]);
-      if (dup_fd == -1) {
-            perror("dup");
-            exit(1);
-      }
-      close(pipefd[1]);
-      char * arguments[] = {"ls","-l",0};
-      if (execvp(arguments[0], arguments) == -1)
-            perror("execvp");
+    int (*fp)(int, int); // Declare pointer to function taking (int, int) returning int
 
-   }
+    fp = add; // Assign function address
+    printf("add via pointer: %d\n", fp(3, 4));
 
-*/
+    // Passing a function pointer as argument 
+    operate(10, 5, subtract);
+
+    // Returning a function pointer ---
+    int (*selected)(int, int) = chooseOperation('*');
+    printf("selected op result: %d\n", selected(3, 5));
+
+    // Array of function pointers 
+    int (*operations[4])(int, int) = { add, subtract, multiply, divide };
+    char *names[] = { "add", "subtract", "multiply", "divide" };
+
+    for (int i = 0; i < 4; i++) {
+        printf("%s(10, 2) = %d\n", names[i], operations[i](10, 2));
+    }
+
+}
 
 
 
@@ -460,6 +574,10 @@ int main(){
    // test_structs();
    // test_union();
    // test_union2();
+   // test_unix_systemcall();
+   // test_fork();
+   // test_fds_dup();
+   // test_function_pointers();
 
    return 0;
 }
