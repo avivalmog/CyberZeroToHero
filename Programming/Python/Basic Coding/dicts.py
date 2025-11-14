@@ -1,4 +1,6 @@
 def dicts():
+    
+
     print("------------ Dicts ------------")
     print("###### dict examples ######")
     print("dict1:")
@@ -7,15 +9,12 @@ def dicts():
         "model": "Mustang",
         "year": 1964
     }
-    print(type(dict1))
     print(dict1)
-
     print("dict2:")
     dict2 = {
         1: "one",
         2: "two",
     }
-    print(type(dict2))
     print(dict2)
 
     print("dict3:")
@@ -24,17 +23,22 @@ def dicts():
         (4, 5, 6): "list2",
     }
 
-    print(type(dict3))
     print(dict3)
 
     # should throw an error, because lists are not hashable
-    # dict4 = {
-    #     [1, 2, 3]: "list1",
-    #     [4, 5, 6]: "list2",
-    # }
-    #
-    # print(type(dict4))
-    # print(dict4)
+    try:
+        dict4 = {
+            [1, 2, 3]: "list1",
+            [4, 5, 6]: "list2",
+        }
+        print(dict4)
+    except Exception as e:
+        print(e)
+
+    dict = {"A":2}
+    print(dict)
+    dict["A"] = dict["A"] + 1
+    print(dict)
 
     print("\n###### dict methods ######\n")
     print("dict items are key and value tuples:")
@@ -62,9 +66,4 @@ def dicts():
 
 
 if __name__ == '__main__':
-    dict = {"A":2}
-    print(dict)
-    dict["A"] = dict["A"] + 1
-    print(dict)
-
-    # dicts()
+    dicts()
