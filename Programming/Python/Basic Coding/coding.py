@@ -1,4 +1,5 @@
 """ Callbable type """
+from functools import reduce
 from typing import Callable
 def test_callable_type():
     def my_function(func: Callable[[int, int], int]):
@@ -105,6 +106,24 @@ def test_ranges():
     lowercase_letters = [chr(i) for i in range(ord('a'), ord('z') + 1)]
     print(lowercase_letters)
 
+def test_lambdas():
+    fib = lambda x: x if x<=1 else fib(x-1) + fib(x-2)
+    print(fib(3))
+    
+    result = (lambda x, y: x + y)(5, 3)
+    print(result)
+
+def test_oneliners():
+    lst = [1, 2, 3, 'Alice', 'Alice']
+    indices = [i for i in range(len(lst)) if lst[i]=='Alice']
+    print(indices)
+
+    n = 3
+    print(reduce(lambda x, y: x * y, range(1, n+1)))
+
+    words = ['bla','abc','dca']
+    print(list(map(lambda word: word[0], words)))
+
 if __name__ == '__main__':
     print("main function")
     # test_callable_type()
@@ -112,5 +131,5 @@ if __name__ == '__main__':
     # test_strings()
     # test_bytes()
     # test_ranges()
-   
+    test_oneliners()
 
