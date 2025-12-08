@@ -87,33 +87,28 @@ void test_arrays_initialization(){
       printf("%d \n" , iarray[2]);
    */
    
-
+   /*
    char * p;
    int * iarrayPtr = iarray;	
+   printf("%d \n" , *iarrayPtr);
+   printf("%d \n" , *(iarrayPtr+1));
+   printf("%d \n" ,  *(iarrayPtr+2));
 
-   // printf("%d \n" , *iarrayPtr);
-   // printf("%d \n" , *(iarrayPtr+1));
-   // printf("%d \n" ,  *(iarrayPtr+2));
+   printf("%p \n" , iarray);
+   printf("%p\n" , iarray + 1);
+   printf("%p\n" , farray);
+   printf("%p\n" , farray + 1);
+   printf("%p\n" , darray);
+   printf("%p\n" , darray + 1);
+   printf("%p\n" , carray);
+   printf("%p\n" , carray + 1);
 
-   // printf("%p \n" , iarray);
-   // printf("%p\n" , iarray + 1);
-   // printf("%p\n" , farray);
-   // printf("%p\n" , farray + 1);
-   // printf("%p\n" , darray);
-   // printf("%p\n" , darray + 1);
-   // printf("%p\n" , carray);
-   // printf("%p\n" , carray + 1);
-
-   // printf("%p p ooo is : \n" , &p);
-
-   // char arr[3] = {'0','1','2'};
-   // printf("%x\n",&arr[0]);
-   // printf("%x\n", &arr[1]);
-   //  printf("%x\n", &arr[2]);
-   // printf("%x\n", &arr[3]);
-
-   // printf("abc\n", "abcd\n", "1", "2","3");
-   // printf("a\n");
+   char arr[3] = {'0','1','2'};
+   printf("%x\n",&arr[0]);
+   printf("%x\n", &arr[1]);
+   printf("%x\n", &arr[2]);
+   printf("%x\n", &arr[3]); 
+   */
 }
 
 /* --- Memory allocation & free --- */

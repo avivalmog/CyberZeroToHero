@@ -57,7 +57,6 @@ struct fun_desc {
 
 char* map(char *array, int array_length, char (*f) (char)){
   char* mapped_array = (char*)(malloc(array_length*sizeof(char)));
-  /* TODO: Complete during task 2.a */
   for(int i = 0; i < array_length; i++)
   {
       mapped_array[i] = f(array[i]);
@@ -67,7 +66,7 @@ char* map(char *array, int array_length, char (*f) (char)){
  
 
 int main(int argc, char **argv){
-  /* TODO: Test your code */
+  
     char * carray = (char*)(malloc(5*sizeof(char)));
     carray[0] = '\0';
     struct fun_desc menu[] = {{"Censor", censor} ,{ "Encrypt", encrypt}, { "Decrypt", decrypt},{"Print dec",dprt},
